@@ -15,6 +15,8 @@
 
 #include <iostream>
 
+#include <typeinfo> // for handing types
+
 int main() {
 
   int i=3; // =: assign operator
@@ -50,6 +52,15 @@ int main() {
     std::cout << "l:" << l << std::endl;
     std::cout << "l2:" << l2 << std::endl;
     std::cout << "l3:" << l3 << std::endl;
+  }
+  {
+    // type handling, it must be used #include <typeinfo>
+    char c = 'a';
+    std::cout << "typeid(c): " << typeid(c).name() << std::endl;
+    int i = 1;
+    std::cout << "typeid(i): " << typeid(i).name() << std::endl;
+    unsigned int ui = 1;
+    std::cout << "typeid(ui): " << typeid(ui).name() << std::endl;
   }
   
   return 0;
