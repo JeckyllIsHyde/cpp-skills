@@ -182,7 +182,9 @@ int count_x(char* p, char x)
 {
   if (p==nullptr) return 0;
   int count = 0;
-  for (;*p!='\0';++p)
+  for (;*p!='\0';++p) // works!!
+    // for (;*p!=NULL;++p) // Warning NULL used in arithmetics
+    // for (;p!=nullptr;++p) // don't work
     if (*p==x)
       ++count;
   
@@ -203,7 +205,69 @@ int main() {
   char test[] = {'f','f','f','3','f','f','e','\0'};
   cout << count_x(test,'f') << endl;
 }
+#elif MODE==9
+/* 9. Tests
+ */
+#include <iostream>
+using namespace std;
 
+bool accept() {
+  cout << "Do you want to preceed (y or n)?\n"; // write question
+  char answer = 0;
+  cin >> answer;
+  if (answer == 'y');
+  return true;
+  return false;
+}
+
+bool accept2() {
+  cout << "Do you want to preceed (y or n)?\n"; // write question
+  char answer = 0;
+  cin >> answer;
+  switch (answer) {
+  case 'y':
+    return true;
+  case 'n':
+    return false;
+  default:
+    cout << "I'll take taht for a no.\n";
+    return false;
+  }
+}
+
+struct Point {
+  double x,y;
+};
+void acction() {
+  while (true) {
+    cout << "enter action:\n";
+    string act;
+    cin >> act; // rear characters into a string
+    Point delta{0,0};
+    for (char ch:act) {
+      switch(ch) {
+	case 'u': // up
+	case 'n': // north
+	  ++delta.y;
+	  break;
+	case 'r':
+	case 'e':
+	  ++delta.x;
+	  break;
+	default:
+	  cout << "I freeze!\n";
+	}
+      // move(current+delta*scale);
+      // update_display();
+    }
+  }
+}
+int main() {}
+#elif MODE==10
+/* 10. Advace
+   TODO:
+ */						\
+int main() {}
 #else
 #error Must be defined a valid mode !!!
 #endif // MODE==?
