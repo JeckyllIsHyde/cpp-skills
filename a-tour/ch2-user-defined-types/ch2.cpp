@@ -125,8 +125,34 @@ void f(Entry_with_union* p) {
 
 int main() {}
 #elif MODE==4
-/* Enumerations */
+/* Enumerations 
+   1. differences between enum and enum class
+   2. define operators for enum classes
+ */
+enum class Color { red, blue, green };
+enum class Traffic_light { green, yellow, red };
 
+Color col = Color::red;
+Traffic_light light = Traffic_light::red;
+
+Traffic_light& operator++(Traffic_light& t)
+{ // prefix increment:++
+  switch (t) {
+  case Traffic_light::green: return t=Traffic_light::yellow;
+  case Traffic_light::yellow: return t=Traffic_light::red;
+  case Traffic_light::red: return t=Traffic_light::green;
+  }
+}
+
+int main() {
+  //--> Color x = red; // ERROR: which red?
+  //--> Color y = Traffic_light::red; // ERROR: that red is not a Color
+  Color z = Color::red;
+  //--> int i = Color::red; // ERROR: Color::red is not an int
+  //--> Color c = 2; // ERROR: 2 is not a Color
+  Traffic_light light = Traffic_light::red;
+  Traffic_light next = ++light;
+}
 #else
 #error MODE directive must be defined !!!
 #endif
