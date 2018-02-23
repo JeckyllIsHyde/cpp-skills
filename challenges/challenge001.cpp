@@ -24,80 +24,65 @@ Available_Workshops* initialize(int start_time[], int duration[], int n) {
 }
 
 bool is_overlaped(const Workshop& w1, const Workshop& w2) {
-  /*
-  cout << " --- w1[" << w1.start_t << "-" << w1.end_t << "]";
-  cout << " vs w2[" << w2.start_t << "-" << w2.end_t << "] --- ";
-  */
-  //
   return (w1.start_t<w2.start_t)?
     ( (w1.end_t<=w2.start_t)? false: true ): 
     ( (w1.start_t>w2.start_t)? 
       ( (w1.start_t>=w2.end_t)? false: true): true );
-  //
-  /*
-  if (w1.start_t<w2.start_t) {
-    if (w1.end_t<=w2.start_t)
-      return false;
-    else
-      return true;
-  } else if (w1.start_t>w2.start_t) {
-    if (w1.start_t>=w2.end_t)
-      return false;
-    else
-      return true;
-  } else
-    return true;
-  */    
 }
 
-bool is_overlaped_with_set(const Workshop& w, Available_Workshops* ptr, vector<int>& aws_id) {
-  bool overlaped = false;
-  for (auto ita_id = aws_id.begin(); ita_id<aws_id.end(); ita_id++)
-    if (is_overlaped(ptr->ws[*ita_id],w)) {
-      overlaped=true;
-      break;
-    }
-  return overlaped;
+bool is_overlaped_the_set(Available_Workshops* ptr,
+			  vector<int>& aws_id,
+			  vector<vector<int>>& overlaped_matrix) {
+  for (auto it=aws_id.begin();it<aws_id.end();it++)
+    for (auto jt=it+1;jt<aws_id.end();jt++)
+      if (overlaped_matrix[*it][*jt])
+	return true;
+  return false;
+}
+
+void print_set(vector<int>& aws_id) {
+  for (auto it=aws_id.begin();it<aws_id.end();it++)
+    cout << *it << ",";
 }
 
 int CalculateMaxWorkshops(Available_Workshops* ptr) {
-  int total = 0;
-  
-  for (int k = 0; k<ptr->n; k++) {
-    vector<int> aws_id;
-    aws_id.push_back(k);
-    for (int i=0;i<ptr->n;i++) {
-      if (aws_id[0]==i)
+  int total=0, N=ptr->n;
+  vector<vector<int>> overlaped_matrix(N,vector<int>(N,0));
+  for (int i=0;i<N;i++)
+    for (int j=i+1;j<N;j++)
+      if (is_overlaped( ptr->ws[i], ptr->ws[j]))
+	overlaped_matrix[i][j]=1;
+  for (int K=N;K>0; K--) {
+    string bitmask(K, 1); // K leading 1's
+    bitmask.resize(N, 0); // N-K trailing 0's
+    // print integers and permute bitmask
+    bool overlaped_set = true;
+    do {
+      vector<int> aws_id;
+      for (int i = 0; i < N; ++i) // [0..N-1] integers
+	if (bitmask[i])
+	  aws_id.push_back(i);
+      //print_set(aws_id);
+      if ( overlaped_set=is_overlaped_the_set(ptr,aws_id,overlaped_matrix) ) {
+	//cout << "Fail!!!" << endl;
 	continue;
-      if ( !is_overlaped_with_set(ptr->ws[i],ptr,aws_id) )
-	aws_id.push_back(i);
+      }
+      else {
+	//cout << "Works!!!" << endl;
+	break;
+      }
+    } while (prev_permutation(bitmask.begin(), bitmask.end()));
+    cout << K << endl;
+    if (!overlaped_set) {
+      total = K;
+      break;
     }
-    cout << "the final set k=" << k << " is for [";
-    for (auto it=aws_id.begin();it<aws_id.end();it++)
-      cout << *it <<",";
-    cout << "]" << endl;
-    total = (total<aws_id.size())? aws_id.size(): total;
   }
-  cout << "the maximum total aws is: ";
   return total;
 }
 
-void comb(int N, int K)
-{
-  std::string bitmask(K, 1); // K leading 1's
-  bitmask.resize(N, 0); // N-K trailing 0's
- 
-  // print integers and permute bitmask
-  do {
-    for (int i = 0; i < N; ++i) // [0..N-1] integers
-      {
-	if (bitmask[i]) std::cout << " " << i;
-      }
-    std::cout << std::endl;
-  } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
-}
-
 int main( int argc, char *argv[]) {
+  
   int n; // number of workshops
   cin >> n;
   // create arrays of unknown size n
@@ -112,13 +97,6 @@ int main( int argc, char *argv[]) {
   Available_Workshops* ptr;
   ptr = initialize(start_time, duration, n);
   cout << CalculateMaxWorkshops(ptr) << endl;
-
-  comb(n,n-1);
-  /*  
-      comb(5,4);
-      comb(5,3);
-      comb(5,2);
-  */
   
   return 0;
 }
